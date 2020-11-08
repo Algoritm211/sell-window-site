@@ -1,13 +1,12 @@
-const forms = () => {
+import checkNuminputs from "./checkNuminputs"
+
+const forms = (state) => {
   const form = document.querySelectorAll('form')
   const input = document.querySelectorAll('input')
   const phoneInputs = document.querySelectorAll('input[name="user_phone"]')
+  const windows = document.querySelectorAll('[data-modal]')
 
-  phoneInputs.forEach(item => {
-    item.addEventListener('input', () => {
-      item.value = item.value.replace(/\D/, '')
-    })
-  })
+  checkNuminputs('input[name="user_phone"]')
 
   const message = {
     loading: 'Загрузка...',
@@ -41,10 +40,21 @@ const forms = () => {
 
       const formData = new FormData(item)
 
+      if (item.getAttribute('data-calc') === 'end') {
+        for(let key in state) {
+          formData.append(key, state[key])
+        }
+      }
+
       postData('assets/server.php', formData)
         .then(result => {
           console.log(result);
           statusMessage.textContent = message.success
+          setTimeout(() => {
+            windows.forEach(item => {
+              item.style.display = 'none'
+            })
+          }, 3100)
         })
         .catch(() => {
           statusMessage.textContent = message.failure
